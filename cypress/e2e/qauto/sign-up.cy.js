@@ -1,336 +1,319 @@
 /// <reference types="cypress" />
 
-let email = `mapema6818+${Date.now()}@alibto.com`
-const correctPassword = 'R7mQ2xLp9A'
+import SignUpForm from '../../pom/forms/SignUpForm';
+import HomePage from '../../pom/pages/HomePage';
+
+let newEmail;
+
+before(() => {
+    cy.fixture('users.json').then((users) => {
+        newEmail = `${users.correctUser.email.split('@')[0]}+${Date.now()}@alibto.com`
+    })
+})
 
 describe('Sign Up Form', () => {
     beforeEach(() => {
-        cy.visit('/');
-        cy.get('.btn-primary').click();
+        HomePage.visit();
+        HomePage.signUpButton.click();
     })
 
     context('Sign Up Process', () => {
 
         it('Successful Sign Up', () => {
-            cy.get('#signupName').type('First');
-            cy.get('#signupLastName').type('Last');
-            cy.get('#signupEmail').type(email);
-            cy.get('#signupPassword').type(correctPassword);
-            cy.get('#signupRepeatPassword').type(correctPassword);
-            cy.get('.modal-content .btn-primary').click();
-            cy.url().should('eq', 'https://qauto.forstudy.space/panel/garage');
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.fillSignUpFormWithCredentials(users.correctUser.correctName, users.correctUser.correctLastName, newEmail, users.correctUser.correctPassword, users.correctUser.correctPassword);
+                SignUpForm.registerButton.click();
+                cy.url().should('eq', 'https://qauto.forstudy.space/panel/garage');
+            })
+
         });
 
         it('Sign Up with existing user', () => {
-            cy.get('#signupName').type('First');
-            cy.get('#signupLastName').type('Last');
-            cy.get('#signupEmail').type(email);
-            cy.get('#signupPassword').type(correctPassword);
-            cy.get('#signupRepeatPassword').type(correctPassword);
-            cy.get('.modal-content .btn-primary').click();
-            cy.get('.alert-danger').should('have.text', 'User already exists');
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.fillSignUpFormWithCredentials(users.correctUser.correctName, users.correctUser.correctLastName, users.correctUser.email, users.correctUser.correctPassword, users.correctUser.correctPassword);
+                SignUpForm.registerButton.click();
+                cy.fixture('sign-up-error-mess.json').then((errMessage) => {
+                    SignUpForm.alertErrorMessage.should('have.text', errMessage.message.userExist);
+                })
+            })
         });
     });
 
     context('First name validation', () => {
 
         it('First Name with 2 letters', () => {
-            cy.get('#signupName').type('aa');
-            cy.get('#signupName').blur();
-            cy.get('.invalid-feedback').should('not.exist');
+            SignUpForm.enterName('aa');
+            SignUpForm.validationErrorMessage.should('not.exist');
         })
 
         it('First Name with 20 letters', () => {
-            cy.get('#signupName').type('qwertyuiolkjhgfdsazx');
-            cy.get('#signupName').blur();
-            cy.get('.invalid-feedback').should('not.exist');
+            SignUpForm.enterName('qwertyuiolkjhgfdsazx');
+            SignUpForm.validationErrorMessage.should('not.exist');
         })
 
         it('First Name field is empty', () => {
             // Test fails because the error text is different from requirements
-            cy.get('#signupName').focus();
-            cy.get('#signupName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Name is required');
+            SignUpForm.nameField.focus();
+            SignUpForm.nameField.blur();
+            cy.fixture('sign-up-error-mess.json').then((errMessage) => {
+                SignUpForm.emptyFieldErrorMessage.should('have.text', errMessage.message.nameRequired);
+            });
+            SignUpForm.emptyFieldErrorMessage.should('have.text', 'Name is required');
         })
 
         it('First Name field with one symbol', () => {
-            cy.get('#signupName').type('a');
-            cy.get('#signupName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Name has to be from 2 to 20 characters long');
+            SignUpForm.enterName('a');
+            cy.fixture('sign-up-error-mess.json').then((errMessage) => {
+                SignUpForm.emptyFieldErrorMessage.should('have.text', errMessage.message.invalidNameLength);
+            });
         })
 
         it('First Name with 21 letters', () => {
-            cy.get('#signupName').type('qwertyuiolkjhgfdsazxa');
-            cy.get('#signupName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Name has to be from 2 to 20 characters long');
-            cy.get('#signupName').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterName('qwertyuiolkjhgfdsazxa');
+            cy.fixture('sign-up-error-mess.json').then((errMessage) => {
+                SignUpForm.emptyFieldErrorMessage.should('have.text', errMessage.message.invalidNameLength);
+            });
+            SignUpForm.nameField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('First Name with a space', () => {
-            cy.get('#signupName').type('qw ea');
-            cy.get('#signupName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Name is invalid');
-            cy.get('#signupName').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterName('qw ea');
+            SignUpForm.nameField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            cy.fixture('sign-up-error-mess.json').then((errMessage) => {
+                SignUpForm.emptyFieldErrorMessage.should('have.text', errMessage.message.invalidName);
+            });
         })
 
         it('First Name with special symbols', () => {
-            cy.get('#signupName').type('awe$');
-            cy.get('#signupName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Name is invalid');
-            cy.get('#signupName').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterName('awe$');
+            SignUpForm.nameField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            cy.fixture('sign-up-error-mess.json').then((errMessage) => {
+                SignUpForm.emptyFieldErrorMessage.should('have.text', errMessage.message.invalidName);
+            });
         })
 
         it('First Name with spaces', () => {
             // Test should fail because the app isn't allow trim the spaces
-            cy.get('#signupName').type(' aa ');
-            cy.get('#signupName').blur();
-            cy.get('.invalid-feedback').should('not.exist');
+            SignUpForm.enterName(' aa $');
+            SignUpForm.validationErrorMessage.should('not.exist');
         })
     });
 
     context('Last name validation', () => {
 
         it('Last Name with 2 letters', () => {
-            cy.get('#signupLastName').type('aa');
-            cy.get('#signupLastName').blur();
-            cy.get('.invalid-feedback').should('not.exist');
+            SignUpForm.enterLastName('aa');
+            SignUpForm.validationErrorMessage.should('not.exist');
         })
 
         it('Last Name with 20 letters', () => {
-            cy.get('#signupLastName').type('qwertyuiolkjhgfdsazx');
-            cy.get('#signupLastName').blur();
-            cy.get('.invalid-feedback').should('not.exist');
+            SignUpForm.enterLastName('qwertyuiolkjhgfdsazx');
+            SignUpForm.validationErrorMessage.should('not.exist');
         })
 
         it('Last Name field is empty', () => {
             // Test fails because the error text is different from requirements
-            cy.get('#signupLastName').focus();
-            cy.get('#signupLastName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Last name is required');
+            SignUpForm.lastNameField.focus();
+            SignUpForm.lastNameField.blur();
+            SignUpForm.emptyFieldErrorMessage.should('have.text', 'Last name is required');
         })
 
         it('Last Name field with one symbol', () => {
-            cy.get('#signupLastName').type('a');
-            cy.get('#signupLastName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Last name has to be from 2 to 20 characters long');
+            SignUpForm.enterLastName('a');
+            SignUpForm.validationErrorMessage.should('have.text', 'Last name has to be from 2 to 20 characters long');
         })
 
         it('Last Name with 21 letters', () => {
-            cy.get('#signupLastName').type('qwertyuiolkjhgfdsazxa');
-            cy.get('#signupLastName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Last name has to be from 2 to 20 characters long');
-            cy.get('#signupLastName').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterLastName('qwertyuiolkjhgfdsazxa');
+            SignUpForm.validationErrorMessage.should('have.text', 'Last name has to be from 2 to 20 characters long');
+            SignUpForm.lastNameField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('Last Name with a space', () => {
-            cy.get('#signupLastName').type('qw ea');
-            cy.get('#signupLastName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Last name is invalid');
-            cy.get('#signupLastName').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterLastName('qw ea');
+            SignUpForm.validationErrorMessage.should('have.text', 'Last name is invalid');
+            SignUpForm.lastNameField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('Last Name with special symbols', () => {
-            cy.get('#signupLastName').type('awe$');
-            cy.get('#signupLastName').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Last name is invalid');
-            cy.get('#signupLastName').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterLastName('awe$');
+            SignUpForm.validationErrorMessage.should('have.text', 'Last name is invalid');
+            SignUpForm.lastNameField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('First Name with spaces', () => {
             // Test should fail because the app isn't allow trim the spaces
-            cy.get('#signupLastName').type(' aa ');
-            cy.get('#signupLastName').blur();
-            cy.get('.invalid-feedback').should('not.exist');
+            SignUpForm.enterLastName(' aa ');
+            SignUpForm.emptyFieldErrorMessage.should('not.exist');
         })
     })
 
     context('Email validation', () => {
 
         it('Email field is empty', () => {
-            cy.get('#signupEmail').focus();
-            cy.get('#signupEmail').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Email required');
-            cy.get('#signupEmail').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.emailField.focus();
+            SignUpForm.emailField.blur();
+            SignUpForm.emptyFieldErrorMessage.should('have.text', 'Email required');
+            SignUpForm.emailField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('Email without "@" symbol', () => {
-            cy.get('#signupEmail').type('asdf.gmail.com');
-            cy.get('#signupEmail').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Email is incorrect');
-            cy.get('#signupEmail').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterEmail('asdf.gmail.com');
+            SignUpForm.validationErrorMessage.should('have.text', 'Email is incorrect');
+            SignUpForm.emailField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('Email with 2 "@" symbols', () => {
-            cy.get('#signupEmail').type('as@d@f.gmail.com');
-            cy.get('#signupEmail').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Email is incorrect');
-            cy.get('#signupEmail').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterEmail('as@d@f.gmail.com');
+            SignUpForm.validationErrorMessage.should('have.text', 'Email is incorrect');
+            SignUpForm.emailField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('Email without "." symbol in domain', () => {
-            cy.get('#signupEmail').type('asdf@gmailcom');
-            cy.get('#signupEmail').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Email is incorrect');
-            cy.get('#signupEmail').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterEmail('asdf@gmailcom');
+            SignUpForm.validationErrorMessage.should('have.text', 'Email is incorrect');
+            SignUpForm.emailField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('Email without text before "@" symbol', () => {
-            cy.get('#signupEmail').type('@gmail.com');
-            cy.get('#signupEmail').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Email is incorrect');
-            cy.get('#signupEmail').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterEmail('@gmail.com');
+            SignUpForm.validationErrorMessage.should('have.text', 'Email is incorrect');
+            SignUpForm.emailField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('Email without letters between "@" and "." symbols', () => {
-            // Test fails because it allows to enter email with cyrillic symbols
-            cy.get('#signupEmail').type('asdf@.com');
-            cy.get('#signupEmail').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Email is incorrect');
-            cy.get('#signupEmail').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterEmail('asdf@.com');
+            SignUpForm.validationErrorMessage.should('have.text', 'Email is incorrect');
+            SignUpForm.emailField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
 
         it('Email with cyrillic symbols', () => {
             // Test fails because it allows to enter email with cyrillic symbols
-            cy.get('#signupEmail').type('ййййй@gmail.com');
-            cy.get('#signupEmail').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Email is incorrect');
-            cy.get('#signupEmail').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterEmail('ййййй@gmail.com');
+            // cy.get('#signupEmail').type('ййййй@gmail.com');
+            // cy.get('#signupEmail').blur();
+            SignUpForm.validationErrorMessage.should('have.text', 'Email is incorrect');
+            SignUpForm.emailField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         })
     })
 
     context('Password field validation', () => {
         it('Valid password with a length of 8 symbols', () => {
-            cy.get('#signupPassword').type('aA123456');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback').should('not.exist');
+            SignUpForm.enterPassword('aA123456');
+            SignUpForm.emptyFieldErrorMessage.should('not.exist');
         });
 
         it('Valid password with a length of 15 symbols', () => {
-            cy.get('#signupPassword').type('aA123456aA12345');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback').should('not.exist');
+            SignUpForm.enterPassword('aA123456aA12345');
+            SignUpForm.emptyFieldErrorMessage.should('not.exist');
         });
 
         it('Password with 7 letters', () => {
-            cy.get('#signupPassword').type('aaaaaaa');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
-            cy.get('#signupPassword').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterPassword('aaaaaaa');
+            SignUpForm.validationErrorMessage.should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
+            SignUpForm.passwordField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         });
 
         it('Password with 16 letters', () => {
-            cy.get('#signupPassword').type('aaaaaaaaaaaaaaaa');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
-            cy.get('#signupPassword').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterPassword('aaaaaaaaaaaaaaaa');
+            SignUpForm.validationErrorMessage.should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
+            SignUpForm.passwordField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         });
 
         it('Password with 8 letters without a capital letter and without a digit', () => {
-            cy.get('#signupPassword').type('aaaaaaaa');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
-            cy.get('#signupPassword').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterPassword('aaaaaaaa');
+            SignUpForm.validationErrorMessage.should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
+            SignUpForm.passwordField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         });
 
         it('Password with 8 letters with a capital letter, but without a digit', () => {
-            cy.get('#signupPassword').type('aaaaaaaA');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
-            cy.get('#signupPassword').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterPassword('aaaaaaaA');
+            SignUpForm.validationErrorMessage.should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
+            SignUpForm.passwordField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         });
 
         it('Password with 8 letters with a digit, but without a capital letter', () => {
-            cy.get('#signupPassword').type('aaaaaaa1');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
-            cy.get('#signupPassword').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterPassword('aaaaaaa1');
+            SignUpForm.validationErrorMessage.should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
+            SignUpForm.passwordField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         });
 
         it('Password with 8 letters with all capital letters', () => {
-            cy.get('#signupPassword').type('AAAAAAAA');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
-            cy.get('#signupPassword').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterPassword('AAAAAAAA');
+            SignUpForm.validationErrorMessage.should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
+            SignUpForm.passwordField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         });
 
         it('Password with 8 letters with all digits', () => {
-            cy.get('#signupPassword').type('12345678');
-            cy.get('#signupPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
-            cy.get('#signupPassword').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.enterPassword('12345678');
+            SignUpForm.validationErrorMessage.should('have.text', 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
+            SignUpForm.passwordField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         });
     });
 
     context('Repeat Password validation', () => {
         it('Empty re-enter password field', () => {
-            cy.get('#signupRepeatPassword').focus();
-            cy.get('#signupRepeatPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Re-enter password required');
-            cy.get('#signupRepeatPassword').should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
+            SignUpForm.repeatPasswordField.focus();
+            SignUpForm.repeatPasswordField.blur();
+            SignUpForm.emptyFieldErrorMessage.should('have.text', 'Re-enter password required');
+            SignUpForm.repeatPasswordField.should('have.class', 'is-invalid').and('have.css', 'border-color', 'rgb(220, 53, 69)');
         });
 
         it('Mismatch Repeat Password', () => {
-            cy.get('#signupPassword').type(correctPassword);
-            cy.get('#signupRepeatPassword').type('R7mQ2xLp9a');
-            cy.get('#signupRepeatPassword').blur();
-            cy.get('.invalid-feedback > p').should('have.text', 'Passwords do not match');
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.enterPassword(users.correctUser.correctPassword);
+                SignUpForm.repeatPasswordField('R7mQ2xLp9a');
+                SignUpForm.validationErrorMessage('.invalid-feedback > p').should('have.text', 'Passwords do not match');
+            })
+
         });
 
     });
 
     context('Registration button', () => {
         it('The register button is not disabled with correct data', () => {
-            cy.get('#signupName').type('First');
-            cy.get('#signupLastName').type('Last');
-            cy.get('#signupEmail').type(email);
-            cy.get('#signupPassword').type(correctPassword);
-            cy.get('#signupRepeatPassword').type(correctPassword);
-            cy.get('.modal-content .btn-primary').should('not.be.disabled');
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.fillSignUpFormWithCredentials(users.correctUser.correctName, users.correctUser.correctLastName, newEmail, users.correctUser.correctPassword, users.correctUser.correctPassword);
+                SignUpForm.registerButton.should('not.be.disabled');
+            })
         });
 
         it('The register button is disabled when incorrect data in the Name field', () => {
-            cy.get('#signupName').type('Fir st');
-            cy.get('#signupLastName').type('Last');
-            cy.get('#signupEmail').type(email);
-            cy.get('#signupPassword').type(correctPassword);
-            cy.get('#signupRepeatPassword').type(correctPassword);
-            cy.get('.modal-content .btn-primary').should('be.disabled');
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.fillSignUpFormWithCredentials('Fir st', users.correctUser.correctLastName, newEmail, users.correctUser.correctPassword, users.correctUser.correctPassword);
+                SignUpForm.registerButton.should('be.disabled');
+            })
         });
 
         it('The register button is disabled when incorrect data in the Last Name field', () => {
-            cy.get('#signupName').type('First');
-            cy.get('#signupLastName').type('La st');
-            cy.get('#signupEmail').type(email);
-            cy.get('#signupPassword').type(correctPassword);
-            cy.get('#signupRepeatPassword').type(correctPassword);
-            cy.get('.modal-content .btn-primary').should('be.disabled');
+
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.fillSignUpFormWithCredentials(users.correctUser.correctName, 'La st', newEmail, users.correctUser.correctPassword, users.correctUser.correctPassword);
+                SignUpForm.registerButton.should('be.disabled');
+            })
         });
 
         it('The register button is disabled when incorrect data in the Email field', () => {
-            cy.get('#signupName').type('First');
-            cy.get('#signupLastName').type('Last');
-            cy.get('#signupEmail').type('a@@f.com');
-            cy.get('#signupPassword').type(correctPassword);
-            cy.get('#signupRepeatPassword').type(correctPassword);
-            cy.get('.modal-content .btn-primary').should('be.disabled');
+
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.fillSignUpFormWithCredentials(users.correctUser.correctName, users.correctUser.correctLastName, 'a@@f.com', users.correctUser.correctPassword, users.correctUser.correctPassword);
+                SignUpForm.registerButton.should('be.disabled');
+            })
         });
 
         it('The register button is disabled when incorrect data in the Password field', () => {
-            cy.get('#signupName').type('First');
-            cy.get('#signupLastName').type('Last');
-            cy.get('#signupEmail').type(email);
-            cy.get('#signupPassword').type(' ');
-            cy.get('#signupRepeatPassword').type(correctPassword);
-            cy.get('.modal-content .btn-primary').should('be.disabled');
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.fillSignUpFormWithCredentials(users.correctUser.correctName, users.correctUser.correctLastName, newEmail, ' ', users.correctUser.correctPassword);
+                SignUpForm.registerButton.should('be.disabled');
+            })
         });
 
         it('The register button is disabled when mismatch data in the Re-enter Password field', () => {
-            cy.get('#signupName').type('First');
-            cy.get('#signupLastName').type('Last');
-            cy.get('#signupEmail').type(email);
-            cy.get('#signupPassword').type(correctPassword);
-            cy.get('#signupRepeatPassword').type('correctPassword');
-            cy.get('.modal-content .btn-primary').should('be.disabled');
+
+            cy.fixture('users.json').then((users) => {
+                SignUpForm.fillSignUpFormWithCredentials(users.correctUser.correctName, users.correctUser.correctLastName, newEmail, users.correctUser.correctPassword, 'correctPassword');
+                SignUpForm.registerButton.should('be.disabled');
+            })
         });
     });
 

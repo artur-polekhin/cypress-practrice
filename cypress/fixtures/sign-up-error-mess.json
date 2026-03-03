@@ -1,0 +1,8 @@
+{
+    "message": {
+        "userExist": "User already exists",
+        "nameRequired": "Name is required",
+        "invalidNameLength": "Name has to be from 2 to 20 characters long",
+        "invalidName": "Name is invalid"
+    }
+}
