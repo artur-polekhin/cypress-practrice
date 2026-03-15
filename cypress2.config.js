@@ -9,6 +9,6 @@ module.exports = defineConfig({
     },
     defaultCommandTimeout: 10000,
     screenshotOnRunFailure: true,
-    baseUrl: 'https://guest:welcome2qauto@qauto.forstudy.space',
+    baseUrl: 'https://guest:welcome2qauto@qauto2.forstudy.space',
   },
 });
