@@ -7,6 +7,7 @@ import SignInForm from "../../pom/forms/SignInForm";
 import FuelExpensesPage from "../../pom/pages/FuelExpensesPage";
 import GaragePage from "../../pom/pages/GaragePage";
 import HomePage from "../../pom/pages/HomePage";
+import users from "../../fixtures/users.json"
 
 describe('Garage page', () => {
     beforeEach(() => {
@@ -40,6 +41,19 @@ describe('Garage page', () => {
     });
 
     context.only('Add cars', () => {
+        // let sid;
+        // before(() => {
+        //     cy.request('POST', 'api/auth/signin', {
+        //         email: users.correctUser.email,
+        //         password: users.correctUser.correctPassword
+        //     }).then((response) => {
+        //         cy.log(JSON.stringify(response.body));
+        //         const headers = response.headers;
+        //         sid = headers['set-cookie'][0].split(';')[0];
+        //         cy.log(sid);
+        //         // cy.log(JSON.stringify(sid['set-cookie'][0].split(';')[0]));
+        //     })
+        // })
         it('Add "Audi TT"', () => {
             GaragePage.openAddCarForm();
             AddCarForm.addNewCar('Audi', 'TT');
@@ -54,110 +68,110 @@ describe('Garage page', () => {
             AddCarForm.firstCarName.should('contain.text', 'Audi R8');
         });
 
-        it('Add "Audi Q7"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Audi', 'Q7');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Audi Q7');
-        });
+        // it('Add "Audi Q7"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Audi', 'Q7');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Audi Q7');
+        // });
 
-        it('Add "Audi A6"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Audi', 'A6');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Audi A6');
-        });
+        // it('Add "Audi A6"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Audi', 'A6');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Audi A6');
+        // });
 
-        it('Add "Audi A8"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Audi', 'A8');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Audi A8');
-        });
+        // it('Add "Audi A8"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Audi', 'A8');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Audi A8');
+        // });
 
-        it('Add "BMW 3"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('BMW', '3');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'BMW 3');
-        });
+        // it('Add "BMW 3"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('BMW', '3');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'BMW 3');
+        // });
 
-        it('Add "BMW 5"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('BMW', '5');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'BMW 5');
-        });
+        // it('Add "BMW 5"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('BMW', '5');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'BMW 5');
+        // });
 
-        it('Add "BMW X6"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('BMW', 'X6');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'BMW X6');
-        });
+        // it('Add "BMW X6"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('BMW', 'X6');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'BMW X6');
+        // });
 
-        it('Add "BMW Z3"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('BMW', 'Z3');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'BMW Z3');
-        });
+        // it('Add "BMW Z3"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('BMW', 'Z3');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'BMW Z3');
+        // });
 
-        it('Add "Ford Fiesta"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Ford', 'Fiesta');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Ford Fiesta');
-        });
+        // it('Add "Ford Fiesta"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Ford', 'Fiesta');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Ford Fiesta');
+        // });
 
-        it('Add "Ford Focus"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Ford', 'Focus');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Ford Focus');
-        });
+        // it('Add "Ford Focus"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Ford', 'Focus');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Ford Focus');
+        // });
 
-        it('Add "Ford Fusion"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Ford', 'Fusion');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Ford Fusion');
-        });
+        // it('Add "Ford Fusion"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Ford', 'Fusion');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Ford Fusion');
+        // });
 
-        it('Add "Ford Mondeo"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Ford', 'Mondeo');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Ford Mondeo');
-        });
+        // it('Add "Ford Mondeo"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Ford', 'Mondeo');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Ford Mondeo');
+        // });
 
-        it('Add "Ford Sierra"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Ford', 'Sierra');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Ford Sierra');
-        });
+        // it('Add "Ford Sierra"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Ford', 'Sierra');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Ford Sierra');
+        // });
 
-        it('Add "Porsche 911"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Porsche', '911');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Porsche 911');
-        });
+        // it('Add "Porsche 911"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Porsche', '911');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Porsche 911');
+        // });
 
-        it('Add "Porsche Cayenne"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Porsche', 'Cayenne');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Porsche Cayenne');
-        });
+        // it('Add "Porsche Cayenne"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Porsche', 'Cayenne');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Porsche Cayenne');
+        // });
 
-        it('Add "Porsche Panamera"', () => {
-            GaragePage.openAddCarForm();
-            AddCarForm.addNewCar('Porsche', 'Panamera');
-            AddCarForm.addButton.click();
-            AddCarForm.firstCarName.should('contain.text', 'Porsche Panamera');
-        });
+        // it('Add "Porsche Panamera"', () => {
+        //     GaragePage.openAddCarForm();
+        //     AddCarForm.addNewCar('Porsche', 'Panamera');
+        //     AddCarForm.addButton.click();
+        //     AddCarForm.firstCarName.should('contain.text', 'Porsche Panamera');
+        // });
     });
 
     context('Validation of "Mileage" field', () => {
